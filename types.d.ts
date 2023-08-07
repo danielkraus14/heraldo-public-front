@@ -72,6 +72,32 @@ export interface AdServer {
   mobileImage: Image;
 }
 
+// funeral notice type definition
+export interface FuneralNotice {
+  _id: number | string;
+  title: string;
+  deseased: string;
+  client: string;
+  religion: string;
+  status: string;
+  content: string;
+  createdBy: User;
+  date: string;
+  createdAt: string;
+}
+
+// printed edition type definition
+export interface PrintedEditionType {
+  _id: number | string;
+  body: string;
+  tags: string[];
+  createdBy: User;
+  date: string;
+  createdAt: string;
+  frontPage: Image;
+  newsletterPDF: Image;
+}
+
 // docs with pagination
 export interface DocsWithPagination {
   docs: any[];

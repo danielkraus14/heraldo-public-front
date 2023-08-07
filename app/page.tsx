@@ -1,52 +1,27 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import { Banner } from "./components/Banner";
 import { CardGridWithSwiper } from "./components/CardGridWithSwiper";
-import { CardHighlight } from "./components/CardHighlight";
 import { Marquee } from "./components/Marquee";
 
-import { CurrencyAndRiverSwiper } from "./features/CurrencyAndRiverSwiper";
+import { CurrencyAndRiver } from "./features/CurrencyAndRiver";
+import { FuneralsPreview } from "./features/FuneralsPreview";
 import { PostsHighlight } from "./features/PostsHighlight";
+import { PostsGrid } from "./features/PostsGrid";
 import { PostsSuperHighlight } from "./features/PostsSuperHighlight";
 
 import {
+  PostsCategories,
   PostsPositions,
   fetchPosts,
   AdServerPositions,
   fetchAdServer,
 } from "@/app/service/app.service";
-
-async function fetchDataCurrency() {
-  const res = await fetch(`https://www.dolarsi.com/api/api.php?type=dolar`);
-  const res2 = await fetch(
-    `https://www.dolarsi.com/api/api.php?type=cotizador`
-  );
-
-  if (!res.ok || !res2.ok) {
-    console.log("error");
-    return;
-  }
-
-  const data = await res.json();
-
-  const data2 = await res2.json();
-
-  return [
-    ...data.filter(
-      (curr: any) =>
-        curr.casa?.nombre.includes("Oficial") ||
-        curr.casa?.nombre?.includes("Blue")
-    ),
-    ...data2.filter(
-      (curr: any) =>
-        curr.casa?.nombre.includes("Peso Uruguayo") ||
-        curr.casa?.nombre?.includes("Real")
-    ),
-  ];
-}
+import { PostsFeatured } from "./features/PostsFeatured";
+import { SwiperFullscreen } from "./components/SwiperFullscreen";
 
 export default async function Home() {
-  // Posts Calls (Highlight, SuperHighlight, TopPosition)
+  // Posts Calls (Highlight, SuperHighlight, TopPosition, FutbolCategory, EspectaculosCategory, CulturaCategory)
   const postsHighlight = await fetchPosts({
     position: PostsPositions.highlight,
     postsLimit: 6,
@@ -55,24 +30,55 @@ export default async function Home() {
     position: PostsPositions.top,
     postsLimit: 4,
   });
+  const postsDeportesCategory = await fetchPosts({
+    category: PostsCategories.deportes,
+    postsLimit: 5,
+  });
+  const postsEspectaculosCategory = await fetchPosts({
+    category: PostsCategories.espectaculos,
+    postsLimit: 5,
+  });
+  const postsCulturaCategory = await fetchPosts({
+    category: PostsCategories.cultura,
+    postsLimit: 4,
+  });
 
-  // AdServer Calls (horizontal2, horizontal3, horizontal4, horizontal5)
-  const { docs: horizontal2 } = await fetchAdServer({
+  // AdServer Calls
+  // (horizontal2, horizontal3, horizontal4, horizontal5,
+  //  horizontal6, horizontal8, horizontal9, horizontal10,
+  //  horizontal11)
+  const { docs: bannerHorizontal2 } = await fetchAdServer({
     position: AdServerPositions.horizontal2,
   });
-  const { docs: horizontal3 } = await fetchAdServer({
+  const { docs: bannerHorizontal3 } = await fetchAdServer({
     position: AdServerPositions.horizontal3,
   });
-  const { docs: horizontal4 } = await fetchAdServer({
+  const { docs: bannerHorizontal4 } = await fetchAdServer({
     position: AdServerPositions.horizontal4,
   });
-  const { docs: horizontal5 } = await fetchAdServer({
+  const { docs: bannerHorizontal5 } = await fetchAdServer({
     position: AdServerPositions.horizontal5,
   });
+  const { docs: bannerHorizontal6 } = await fetchAdServer({
+    position: AdServerPositions.horizontal6,
+  });
+  const { docs: bannerHorizontal8 } = await fetchAdServer({
+    position: AdServerPositions.horizontal8,
+  });
+  const { docs: bannerHorizontal9 } = await fetchAdServer({
+    position: AdServerPositions.horizontal9,
+  });
+  const { docs: bannerHorizontal10 } = await fetchAdServer({
+    position: AdServerPositions.horizontal10,
+  });
+  const { docs: bannerHorizontal11 } = await fetchAdServer({
+    position: AdServerPositions.horizontal11,
+  });
 
-  console.log("HOR1", horizontal2);
-
-  const dataCurrency = await fetchDataCurrency();
+  // Funerals Calls
+  const { docs: funerals } = await fetch(
+    `${process.env.API_URL}/funeral-notices`
+  ).then((res) => res.json());
 
   return (
     <div className="flex flex-col gap-5">
@@ -85,16 +91,16 @@ export default async function Home() {
       <section className="flex flex-col gap-5">
         <Marquee titles={[].map((post: any) => post.title)} />
 
-        {horizontal2.map(
+        {bannerHorizontal2.map(
           (banner: any) =>
             banner.status === "published" && (
               <Banner
                 banner={{
-                  title: horizontal2[0]?.title,
-                  site: horizontal2[0]?.site,
-                  url: horizontal2[0]?.url,
-                  desktopImage: horizontal2[0]?.desktopImage,
-                  mobileImage: horizontal2[0]?.mobileImage,
+                  title: bannerHorizontal2[0]?.title,
+                  site: bannerHorizontal2[0]?.site,
+                  url: bannerHorizontal2[0]?.url,
+                  desktopImage: bannerHorizontal2[0]?.desktopImage,
+                  mobileImage: bannerHorizontal2[0]?.mobileImage,
                 }}
                 className="container mx-auto"
                 key={banner._id}
@@ -112,23 +118,23 @@ export default async function Home() {
       <section className="container flex flex-col gap-5 mx-auto">
         <Banner
           banner={{
-            title: horizontal3[0]?.title,
-            site: horizontal3[0]?.site,
-            url: horizontal3[0]?.url,
-            desktopImage: horizontal3[0]?.desktopImage,
-            mobileImage: horizontal3[0]?.mobileImage,
+            title: bannerHorizontal3[0]?.title,
+            site: bannerHorizontal3[0]?.site,
+            url: bannerHorizontal3[0]?.url,
+            desktopImage: bannerHorizontal3[0]?.desktopImage,
+            mobileImage: bannerHorizontal3[0]?.mobileImage,
           }}
         />
 
-        <CurrencyAndRiverSwiper dataCurrency={dataCurrency} dataRiver={[]} />
+        <CurrencyAndRiver />
 
         <Banner
           banner={{
-            title: horizontal4[0]?.title,
-            site: horizontal4[0]?.site,
-            url: horizontal4[0]?.url,
-            desktopImage: horizontal4[0]?.desktopImage,
-            mobileImage: horizontal4[0]?.mobileImage,
+            title: bannerHorizontal4[0]?.title,
+            site: bannerHorizontal4[0]?.site,
+            url: bannerHorizontal4[0]?.url,
+            desktopImage: bannerHorizontal4[0]?.desktopImage,
+            mobileImage: bannerHorizontal4[0]?.mobileImage,
           }}
         />
       </section>
@@ -138,16 +144,100 @@ export default async function Home() {
         <CardGridWithSwiper data={postsTopPosition} cardClassName="h-[390px]" />
       </section>
 
-      {/* BANNER SECTION (horizontal5) */}
-      <Banner
-        banner={{
-          title: horizontal5[0]?.title,
-          site: horizontal5[0]?.site,
-          url: horizontal5[0]?.url,
-          desktopImage: horizontal5[0]?.desktopImage,
-          mobileImage: horizontal5[0]?.mobileImage,
-        }}
-      />
+      {/* POSTGRID SECTION & BANNERS (FUTBOL TAG, bannerHorizontal5, bannerHorizontal6 ) */}
+      <section className="container mx-auto flex flex-col gap-5">
+        <Banner
+          banner={{
+            title: bannerHorizontal5[0]?.title,
+            site: bannerHorizontal5[0]?.site,
+            url: bannerHorizontal5[0]?.url,
+            desktopImage: bannerHorizontal5[0]?.desktopImage,
+            mobileImage: bannerHorizontal5[0]?.mobileImage,
+          }}
+        />
+
+        {postsDeportesCategory.length > 0 && (
+          <PostsGrid
+            posts={postsDeportesCategory.slice(0, 4)}
+            title="Liga Profesional"
+          />
+        )}
+
+        <Banner
+          banner={{
+            title: bannerHorizontal6[0]?.title,
+            site: bannerHorizontal6[0]?.site,
+            url: bannerHorizontal6[0]?.url,
+            desktopImage: bannerHorizontal6[0]?.desktopImage,
+            mobileImage: bannerHorizontal6[0]?.mobileImage,
+          }}
+        />
+      </section>
+
+      {/* FUNERALS PREVIEW SECTION & BANNER (horizontal8, horizontal9) & POSTS-FEATURED (category: deportes) */}
+      <section className="container mx-auto flex flex-col gap-5">
+        <FuneralsPreview funerals={funerals.slice(0, 5)} />
+
+        <Banner
+          banner={{
+            title: bannerHorizontal8[0]?.title,
+            site: bannerHorizontal8[0]?.site,
+            url: bannerHorizontal8[0]?.url,
+            desktopImage: bannerHorizontal8[0]?.desktopImage,
+            mobileImage: bannerHorizontal8[0]?.mobileImage,
+          }}
+        />
+
+        <PostsFeatured posts={postsDeportesCategory} />
+
+        <Banner
+          banner={{
+            title: bannerHorizontal9[0]?.title,
+            site: bannerHorizontal9[0]?.site,
+            url: bannerHorizontal9[0]?.url,
+            desktopImage: bannerHorizontal9[0]?.desktopImage,
+            mobileImage: bannerHorizontal9[0]?.mobileImage,
+          }}
+        />
+      </section>
+
+      {/* GALLERY IMAGE FULLSCREEN (swiper) SECTION */}
+      <section>
+        <SwiperFullscreen
+          posts={postsEspectaculosCategory}
+          className="h-[700px]"
+        />
+      </section>
+
+      {/* BANNERS (horizontal10, horizontal11) & POSTGRID (cultura, magazine) */}
+      <section className="container mx-auto flex flex-col gap-5">
+        <Banner
+          banner={{
+            title: bannerHorizontal10[0]?.title,
+            site: bannerHorizontal10[0]?.site,
+            url: bannerHorizontal10[0]?.url,
+            desktopImage: bannerHorizontal10[0]?.desktopImage,
+            mobileImage: bannerHorizontal10[0]?.mobileImage,
+          }}
+        />
+
+        <PostsGrid posts={postsCulturaCategory} title="Cultura" />
+
+        <Banner
+          banner={{
+            title: bannerHorizontal11[0]?.title,
+            site: bannerHorizontal11[0]?.site,
+            url: bannerHorizontal11[0]?.url,
+            desktopImage: bannerHorizontal11[0]?.desktopImage,
+            mobileImage: bannerHorizontal11[0]?.mobileImage,
+          }}
+        />
+
+        <PostsGrid
+          posts={postsEspectaculosCategory.slice(0, 4)}
+          title="Magazine"
+        />
+      </section>
     </div>
   );
 }
